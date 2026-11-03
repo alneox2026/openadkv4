@@ -1,0 +1,43 @@
+# For a normal deployment, use scripts/cloudshell_build_middleware.sh and
+# scripts/cloudshell_deploy_middleware.sh instead of this manual example.
+# Those scripts derive stack-specific images, resource names, state, and
+# runtime collections. Shared billing collection names come from Terraform
+# configuration (variables.tf defaults or terraform.tfvars).
+project_id      = "YOUR_PROJECT_ID"
+region          = "us-central1"
+gateway_image   = "us-central1-docker.pkg.dev/YOUR_PROJECT_ID/ceosystem/YOUR_STACK-gateway:YOUR_TAG"
+worker_image    = "us-central1-docker.pkg.dev/YOUR_PROJECT_ID/ceosystem/YOUR_STACK-persistence-worker:YOUR_TAG"
+
+gateway_service_name                    = "YOUR_STACK-gateway"
+worker_service_name                     = "YOUR_STACK-persistence-worker"
+gateway_service_account_name            = "YOUR_STACK-gateway-sa"
+worker_service_account_name             = "YOUR_STACK-worker-sa"
+eventarc_service_account_name           = "YOUR_STACK-eventarc-sa"
+billing_reconciler_service_account_name = "YOUR_STACK-reconciler-sa"
+pubsub_topic_name                       = "YOUR_STACK-turn-events"
+allowed_origins                         = ["https://ceoappdev.flutterflow.app"]
+gateway_stream_debug                    = false
+
+# V4 prepaid wallet gate and worker-owned settlement.
+# Requires an active wallet with at least $0.05 available before requests are
+# accepted. The gateway performs one read only: it does not reserve or debit
+# funds. Completed per-turn usage is recorded immutably and wallet debits are
+# applied in bounded batches. Shortfalls become shared wallet debt, repaid first
+# by the shared billing service's idempotent top-up credit path.
+billing_enforcement_enabled    = true
+billing_reconciliation_enabled = true
+billing_reconciliation_schedule = "0 * * * *"
+billing_usage_reconciliation_batch_size = 3
+billing_usage_reconciliation_initial_backoff_seconds = 300
+billing_usage_reconciliation_max_backoff_seconds = 21600
+billing_usage_reconciliation_retention_seconds = 604800
+deployment_environment         = "development"
+billing_minimum_balance_nanos  = 50000000
+billing_batch_settlement_enabled = true
+billing_batch_max_age_seconds = 3600
+billing_batch_session_idle_seconds = 300
+billing_batch_max_turns = 20
+billing_batch_max_exposure_nanos = 1000000000
+
+# Optional: add Cloud Monitoring notification channel resource names for launch alerts.
+alert_notification_channels = []

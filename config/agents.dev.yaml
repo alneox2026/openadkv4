@@ -1,0 +1,12 @@
+agents:
+  maximus2026:
+    agent_id: maximus2026
+    backend: cloud_run_adk
+    model: gpt-6-luna
+    base_url: https://maximus-2026-281577273798.us-central1.run.app
+    app_name: app
+    region: us-central1
+    streaming_enabled: true
+    persistence_enabled: true
+    auth_policy: firebase
+    runtime_session_cleanup: cloud_run_adk
